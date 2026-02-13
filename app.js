@@ -2,15 +2,23 @@
    StudyVerse — Application Logic
    ============================================ */
 
-// ── Firebase config is loaded from config.js (gitignored) ──
-// If you see errors, make sure config.js exists with your firebaseConfig.
-// See config.example.js for the template.
+// ── Firebase Configuration ──
+// NOTE: Firebase web API keys are NOT secret. They are always visible
+// in the browser. Your DATA is protected by Firestore Security Rules,
+// not by hiding these keys. See FIREBASE_SETUP_GUIDE.md for details.
+const firebaseConfig = {
+    apiKey: "AIzaSyBzzz-p9O3b6cFSmak_llQaVVavMkMhKnw",
+    authDomain: "studyverse-80992.firebaseapp.com",
+    projectId: "studyverse-80992",
+    storageBucket: "studyverse-80992.firebasestorage.app",
+    messagingSenderId: "54219323523",
+    appId: "1:54219323523:web:0de07d37c14853da9dc3b6",
+    measurementId: "G-6H4WG9CS5G"
+};
 
+// Initialize Firebase
 let auth, db;
 try {
-    if (typeof firebaseConfig === 'undefined') {
-        throw new Error('config.js not found! Copy config.example.js to config.js and add your Firebase keys.');
-    }
     firebase.initializeApp(firebaseConfig);
     auth = firebase.auth();
     db = firebase.firestore();
@@ -19,7 +27,7 @@ try {
     document.addEventListener('DOMContentLoaded', () => {
         const overlay = document.getElementById('loadingOverlay');
         if (overlay) overlay.classList.remove('active');
-        alert('Firebase config error: ' + err.message);
+        alert('Firebase error: ' + err.message);
     });
 }
 
