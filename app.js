@@ -21,14 +21,14 @@ let currentFilter = 'all';        // 'all', 'study', or 'life'
 let selectedMood = '';
 
 // ============================================
-// PARTICLE ANIMATION SYSTEM
+// 🌸 SAKURA BLOSSOM PARTICLE SYSTEM
 // ============================================
-class ParticleSystem {
+class SakuraSystem {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
-        this.particles = [];
-        this.mouse = { x: 0, y: 0 };
+        this.petals = [];
+        this.mouse = { x: -1000, y: -1000 };
         this.resize();
         this.init();
         this.bindEvents();
@@ -41,39 +41,81 @@ class ParticleSystem {
     }
 
     init() {
-        const count = Math.min(80, Math.floor((this.canvas.width * this.canvas.height) / 15000));
-        this.particles = [];
+        const count = Math.min(50, Math.floor((this.canvas.width * this.canvas.height) / 25000));
+        this.petals = [];
         for (let i = 0; i < count; i++) {
-            this.particles.push({
-                x: Math.random() * this.canvas.width,
-                y: Math.random() * this.canvas.height,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: (Math.random() - 0.5) * 0.5,
-                radius: Math.random() * 2.5 + 0.5,
-                opacity: Math.random() * 0.5 + 0.1,
-                color: this.getRandomColor(),
-                pulse: Math.random() * Math.PI * 2,
-                pulseSpeed: Math.random() * 0.02 + 0.01,
-            });
+            this.petals.push(this.createPetal(true));
         }
     }
 
-    getRandomColor() {
+    createPetal(randomY = false) {
+        return {
+            x: Math.random() * this.canvas.width,
+            y: randomY ? Math.random() * this.canvas.height : -20,
+            size: Math.random() * 8 + 4,
+            speedY: Math.random() * 0.4 + 0.15,       // gentle fall
+            speedX: Math.random() * 0.3 - 0.15,        // slight horizontal drift
+            rotation: Math.random() * Math.PI * 2,
+            rotationSpeed: (Math.random() - 0.5) * 0.015,
+            sway: Math.random() * Math.PI * 2,         // phase for sway
+            swaySpeed: Math.random() * 0.008 + 0.004,
+            swayAmount: Math.random() * 30 + 15,       // sway amplitude
+            opacity: Math.random() * 0.4 + 0.15,
+            color: this.getColor(),
+            type: Math.random() > 0.3 ? 'petal' : 'dot', // mix petals and tiny dots
+        };
+    }
+
+    getColor() {
         const colors = [
-            'rgba(108, 92, 231,',   // purple
-            'rgba(162, 155, 254,',  // light purple
-            'rgba(0, 206, 201,',    // teal
-            'rgba(253, 121, 168,',  // pink
-            'rgba(253, 203, 110,',  // yellow
+            { r: 240, g: 160, b: 184 },   // sakura pink
+            { r: 245, g: 185, b: 195 },   // light sakura
+            { r: 212, g: 112, b: 138 },   // deep sakura
+            { r: 176, g: 156, b: 216 },   // wisteria
+            { r: 255, g: 220, b: 210 },   // peach
+            { r: 232, g: 200, b: 120 },   // koi gold
+            { r: 240, g: 235, b: 228 },   // cream white
         ];
         return colors[Math.floor(Math.random() * colors.length)];
     }
 
+    drawPetal(p) {
+        this.ctx.save();
+        this.ctx.translate(p.x, p.y);
+        this.ctx.rotate(p.rotation);
+        this.ctx.globalAlpha = p.opacity;
+
+        if (p.type === 'petal') {
+            // Draw petal shape — two curved quadratic bezier curves
+            const s = p.size;
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, 0);
+            this.ctx.quadraticCurveTo(s * 0.8, -s * 0.5, s, 0);
+            this.ctx.quadraticCurveTo(s * 0.8, s * 0.5, 0, 0);
+            this.ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, 1)`;
+            this.ctx.fill();
+
+            // Subtle inner glow
+            this.ctx.beginPath();
+            this.ctx.moveTo(s * 0.2, 0);
+            this.ctx.quadraticCurveTo(s * 0.6, -s * 0.2, s * 0.8, 0);
+            this.ctx.quadraticCurveTo(s * 0.6, s * 0.2, s * 0.2, 0);
+            this.ctx.fillStyle = `rgba(255, 255, 255, 0.3)`;
+            this.ctx.fill();
+        } else {
+            // Tiny glowing dot (firefly-like)
+            const s = p.size * 0.3;
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, s, 0, Math.PI * 2);
+            this.ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, 1)`;
+            this.ctx.fill();
+        }
+
+        this.ctx.restore();
+    }
+
     bindEvents() {
-        window.addEventListener('resize', () => {
-            this.resize();
-            this.init();
-        });
+        window.addEventListener('resize', () => { this.resize(); this.init(); });
         window.addEventListener('mousemove', (e) => {
             this.mouse.x = e.clientX;
             this.mouse.y = e.clientY;
@@ -83,69 +125,41 @@ class ParticleSystem {
     animate() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        for (let i = 0; i < this.particles.length; i++) {
-            const p = this.particles[i];
+        for (let i = 0; i < this.petals.length; i++) {
+            const p = this.petals[i];
 
-            // Update
-            p.x += p.vx;
-            p.y += p.vy;
-            p.pulse += p.pulseSpeed;
+            // Gentle sway motion
+            p.sway += p.swaySpeed;
+            p.x += p.speedX + Math.sin(p.sway) * 0.3;
+            p.y += p.speedY;
+            p.rotation += p.rotationSpeed;
 
-            // Wrap around edges
-            if (p.x < -10) p.x = this.canvas.width + 10;
-            if (p.x > this.canvas.width + 10) p.x = -10;
-            if (p.y < -10) p.y = this.canvas.height + 10;
-            if (p.y > this.canvas.height + 10) p.y = -10;
-
-            // Pulsing opacity
-            const pulsedOpacity = p.opacity + Math.sin(p.pulse) * 0.15;
-
-            // Draw particle
-            this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            this.ctx.fillStyle = p.color + ' ' + Math.max(0, pulsedOpacity) + ')';
-            this.ctx.fill();
-
-            // Draw connections
-            for (let j = i + 1; j < this.particles.length; j++) {
-                const p2 = this.particles[j];
-                const dx = p.x - p2.x;
-                const dy = p.y - p2.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < 150) {
-                    const lineOpacity = (1 - dist / 150) * 0.15;
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(p.x, p.y);
-                    this.ctx.lineTo(p2.x, p2.y);
-                    this.ctx.strokeStyle = `rgba(108, 92, 231, ${lineOpacity})`;
-                    this.ctx.lineWidth = 0.5;
-                    this.ctx.stroke();
-                }
+            // Mouse repulsion — gentle push
+            const dx = p.x - this.mouse.x;
+            const dy = p.y - this.mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 80) {
+                const force = (80 - dist) / 80 * 0.4;
+                p.x += (dx / dist) * force;
+                p.y += (dy / dist) * force;
             }
 
-            // Mouse interaction
-            const mdx = p.x - this.mouse.x;
-            const mdy = p.y - this.mouse.y;
-            const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-            if (mDist < 120) {
-                const force = (120 - mDist) / 120;
-                p.vx += (mdx / mDist) * force * 0.03;
-                p.vy += (mdy / mDist) * force * 0.03;
+            // Recycle petals that fall off screen
+            if (p.y > this.canvas.height + 20 || p.x < -40 || p.x > this.canvas.width + 40) {
+                this.petals[i] = this.createPetal(false);
+                continue;
             }
 
-            // Speed damping
-            p.vx *= 0.99;
-            p.vy *= 0.99;
+            this.drawPetal(p);
         }
 
         requestAnimationFrame(() => this.animate());
     }
 }
 
-// Init particles on load
+// Init sakura on load
 const particleCanvas = document.getElementById('particles-canvas');
-const particleSystem = new ParticleSystem(particleCanvas);
+const sakuraSystem = new SakuraSystem(particleCanvas);
 
 // ============================================
 // AUTHENTICATION
