@@ -1,184 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Track your daily study progress, save notes, images, and monitor your learning journey.">
-  <title>StudyVerse — Track Your Study Progress</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Track your daily study progress and life moments, save notes, images, and monitor your journey.">
+    <title>StudyVerse — Track Your Study & Life Progress</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 </head>
+
 <body>
 
-  <!-- Animated Background -->
-  <div class="bg-gradient"></div>
-  <canvas id="particles-canvas"></canvas>
+    <!-- Animated Background -->
+    <div class="bg-gradient"></div>
+    <canvas id="particles-canvas"></canvas>
 
-  <!-- App Container -->
-  <div class="app-container">
+    <!-- App Container -->
+    <div class="app-container">
 
-    <!-- ====== LOGIN PAGE ====== -->
-    <div class="login-page" id="loginPage">
-      <div class="login-card">
-        <div class="login-icon">📚</div>
-        <h1 class="login-title">StudyVerse</h1>
-        <p class="login-subtitle">Track your daily study progress, save notes & images, and watch your learning journey grow.</p>
-        <button class="google-btn" id="googleSignInBtn" onclick="signInWithGoogle()">
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-          Sign in with Google
-        </button>
-        <p class="login-footer">🔒 Your data is private. Only you can see it.</p>
-      </div>
+        <!-- ====== LOGIN PAGE ====== -->
+        <div class="login-page" id="loginPage">
+            <div class="login-card">
+                <div class="login-icon">📚</div>
+                <h1 class="login-title">StudyVerse</h1>
+                <p class="login-subtitle">Track your daily study progress & life moments.<br>Save notes, images, and
+                    watch your journey grow.</p>
+                <button class="google-btn" id="googleSignInBtn" onclick="signInWithGoogle()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                    Sign in with Google
+                </button>
+                <p class="login-footer">🔒 Your data is private. Only you can see it.</p>
+            </div>
+        </div>
+
+        <!-- ====== DASHBOARD ====== -->
+        <div class="dashboard" id="dashboard">
+
+            <!-- Navbar -->
+            <nav class="navbar">
+                <div class="nav-brand">
+                    <div class="nav-brand-icon">📚</div>
+                    <span class="nav-brand-text">StudyVerse</span>
+                </div>
+                <div class="nav-user">
+                    <div class="nav-user-info">
+                        <div class="nav-user-name" id="userName">User</div>
+                        <div class="nav-user-email" id="userEmail">user@email.com</div>
+                    </div>
+                    <img class="nav-avatar" id="userAvatar" src="https://via.placeholder.com/40" alt="Avatar">
+                    <button class="btn-signout" onclick="signOutUser()">Sign Out</button>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content">
+
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon">📖</div>
+                        <div class="stat-value" id="statTotalEntries">0</div>
+                        <div class="stat-label">Study Entries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-value" id="statStreak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🌟</div>
+                        <div class="stat-value" id="statLifeEntries">0</div>
+                        <div class="stat-label">Life Entries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📸</div>
+                        <div class="stat-value" id="statImages">0</div>
+                        <div class="stat-label">Images Saved</div>
+                    </div>
+                </div>
+
+                <!-- Overall Progress -->
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-title">🎯 Monthly Progress</div>
+                        <div class="progress-percentage" id="progressPercent">0%</div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-details">
+                        <div class="progress-detail">Goal: <span id="progressGoal">30</span> entries this month</div>
+                        <div class="progress-detail">Completed: <span id="progressDone">0</span> entries</div>
+                    </div>
+                </div>
+
+                <!-- Entries Section -->
+                <div class="section-header">
+                    <h2 class="section-title"><span class="icon">📝</span> My Journal</h2>
+                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                        <div class="section-tabs">
+                            <button class="section-tab active" id="tabAll" onclick="filterEntries('all')">All</button>
+                            <button class="section-tab" id="tabStudy" onclick="filterEntries('study')">📖 Study</button>
+                            <button class="section-tab life" id="tabLife" onclick="filterEntries('life')">🌟
+                                Life</button>
+                        </div>
+                        <button class="btn-add" onclick="openModal()">
+                            <span>＋</span> Add Entry
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Entries Feed -->
+                <div class="entries-feed" id="entriesFeed">
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">🚀</div>
+                        <h3 class="empty-title">Start Your Journey!</h3>
+                        <p class="empty-text">Add your first entry and begin tracking your study & life progress today.
+                        </p>
+                    </div>
+                </div>
+
+            </main>
+        </div>
     </div>
 
-    <!-- ====== DASHBOARD ====== -->
-    <div class="dashboard" id="dashboard">
+    <!-- ====== ADD/EDIT ENTRY MODAL ====== -->
+    <div class="modal-overlay" id="entryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title"><span>✏️</span> <span id="modalTitleText">New Entry</span></h3>
+                <button class="btn-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
 
-      <!-- Navbar -->
-      <nav class="navbar">
-        <div class="nav-brand">
-          <div class="nav-brand-icon">📚</div>
-          <span class="nav-brand-text">StudyVerse</span>
+                <!-- Entry Type Toggle -->
+                <div class="entry-type-toggle">
+                    <div class="toggle-option active" id="toggleStudy" onclick="setEntryType('study')">
+                        <span class="toggle-emoji">📖</span> Study
+                    </div>
+                    <div class="toggle-option life" id="toggleLife" onclick="setEntryType('life')">
+                        <span class="toggle-emoji">🌟</span> Daily Life
+                    </div>
+                </div>
+
+                <!-- Common: Date -->
+                <div class="form-group">
+                    <label class="form-label" for="entryDate">Date</label>
+                    <input type="date" class="form-input" id="entryDate">
+                </div>
+
+                <!-- Study-specific fields -->
+                <div class="study-fields active" id="studyFields">
+                    <div class="form-group">
+                        <label class="form-label" for="entrySubject">Subject / Topic</label>
+                        <input type="text" class="form-input" id="entrySubject"
+                            placeholder="e.g. Mathematics, Physics, History...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="entryText">What did you study today?</label>
+                        <textarea class="form-textarea" id="entryText"
+                            placeholder="Write about what you read, learned, or accomplished today..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="entryProgress">Progress Level</label>
+                        <select class="form-select" id="entryProgress">
+                            <option value="just-started">🌱 Just Started</option>
+                            <option value="in-progress" selected>📖 In Progress</option>
+                            <option value="almost-done">🔥 Almost Done</option>
+                            <option value="completed">✅ Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Daily Life fields -->
+                <div class="daily-life-fields" id="lifeFields">
+                    <div class="form-group">
+                        <label class="form-label">Mood</label>
+                        <div class="mood-selector" id="moodSelector">
+                            <div class="mood-option" onclick="selectMood(this, '😊 Happy')"><span>😊</span> Happy</div>
+                            <div class="mood-option" onclick="selectMood(this, '😌 Peaceful')"><span>😌</span> Peaceful
+                            </div>
+                            <div class="mood-option" onclick="selectMood(this, '💪 Productive')"><span>💪</span>
+                                Productive</div>
+                            <div class="mood-option" onclick="selectMood(this, '🤔 Reflective')"><span>🤔</span>
+                                Reflective</div>
+                            <div class="mood-option" onclick="selectMood(this, '😴 Tired')"><span>😴</span> Tired</div>
+                            <div class="mood-option" onclick="selectMood(this, '🎉 Excited')"><span>🎉</span> Excited
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="lifeTitle">Title</label>
+                        <input type="text" class="form-input" id="lifeTitle"
+                            placeholder="e.g. Morning walk, Cooked dinner, Met friends...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="lifeText">Tell about your day</label>
+                        <textarea class="form-textarea" id="lifeText"
+                            placeholder="Write about your day, memorable moments, thoughts, anything..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Common: Image Upload -->
+                <div class="form-group">
+                    <label class="form-label">Attach Images</label>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">🖼️</div>
+                        <div class="upload-text">Drop images here or <span>browse</span></div>
+                        <div class="upload-hint">Max 3 images, 2MB each</div>
+                        <input type="file" id="imageInput" accept="image/*" multiple style="display:none">
+                    </div>
+                    <div class="image-previews" id="imagePreviews"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-save" id="btnSave" onclick="saveEntry()">Save Entry</button>
+            </div>
         </div>
-        <div class="nav-user">
-          <div class="nav-user-info">
-            <div class="nav-user-name" id="userName">User</div>
-            <div class="nav-user-email" id="userEmail">user@email.com</div>
-          </div>
-          <img class="nav-avatar" id="userAvatar" src="https://via.placeholder.com/40" alt="Avatar">
-          <button class="btn-signout" onclick="signOutUser()">Sign Out</button>
-        </div>
-      </nav>
-
-      <!-- Main Content -->
-      <main class="main-content">
-
-        <!-- Stats Row -->
-        <div class="stats-row">
-          <div class="stat-card">
-            <div class="stat-icon">📖</div>
-            <div class="stat-value" id="statTotalEntries">0</div>
-            <div class="stat-label">Total Entries</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🔥</div>
-            <div class="stat-value" id="statStreak">0</div>
-            <div class="stat-label">Day Streak</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">📸</div>
-            <div class="stat-value" id="statImages">0</div>
-            <div class="stat-label">Images Saved</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-value" id="statThisWeek">0</div>
-            <div class="stat-label">This Week</div>
-          </div>
-        </div>
-
-        <!-- Overall Progress -->
-        <div class="progress-section">
-          <div class="progress-header">
-            <div class="progress-title">🎯 Overall Progress</div>
-            <div class="progress-percentage" id="progressPercent">0%</div>
-          </div>
-          <div class="progress-bar-container">
-            <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
-          </div>
-          <div class="progress-details">
-            <div class="progress-detail">Goal: <span id="progressGoal">30</span> entries this month</div>
-            <div class="progress-detail">Completed: <span id="progressDone">0</span> entries</div>
-          </div>
-        </div>
-
-        <!-- Entries Section -->
-        <div class="section-header">
-          <h2 class="section-title"><span class="icon">📝</span> Study Journal</h2>
-          <button class="btn-add" onclick="openModal()">
-            <span>＋</span> Add Entry
-          </button>
-        </div>
-
-        <!-- Entries Feed -->
-        <div class="entries-feed" id="entriesFeed">
-          <div class="empty-state" id="emptyState">
-            <div class="empty-icon">🚀</div>
-            <h3 class="empty-title">Start Your Journey!</h3>
-            <p class="empty-text">Add your first study entry and begin tracking your progress today.</p>
-          </div>
-        </div>
-
-      </main>
     </div>
-  </div>
 
-  <!-- ====== ADD/EDIT ENTRY MODAL ====== -->
-  <div class="modal-overlay" id="entryModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 class="modal-title"><span>✏️</span> <span id="modalTitleText">New Study Entry</span></h3>
-        <button class="btn-close" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label" for="entryDate">Date</label>
-          <input type="date" class="form-input" id="entryDate">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="entrySubject">Subject / Topic</label>
-          <input type="text" class="form-input" id="entrySubject" placeholder="e.g. Mathematics, Physics, History...">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="entryText">What did you study today?</label>
-          <textarea class="form-textarea" id="entryText" placeholder="Write about what you read, learned, or accomplished today..."></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="entryProgress">Progress Level</label>
-          <select class="form-select" id="entryProgress">
-            <option value="just-started">🌱 Just Started</option>
-            <option value="in-progress" selected>📖 In Progress</option>
-            <option value="almost-done">🔥 Almost Done</option>
-            <option value="completed">✅ Completed</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Attach Images</label>
-          <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">🖼️</div>
-            <div class="upload-text">Drop images here or <span>browse</span></div>
-            <div class="upload-hint">Max 3 images, 2MB each</div>
-            <input type="file" id="imageInput" accept="image/*" multiple style="display:none">
-          </div>
-          <div class="image-previews" id="imagePreviews"></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-save" id="btnSave" onclick="saveEntry()">Save Entry</button>
-      </div>
+    <!-- Image Lightbox -->
+    <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+        <img id="lightboxImage" src="" alt="Preview">
     </div>
-  </div>
 
-  <!-- Image Lightbox -->
-  <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
-    <img id="lightboxImage" src="" alt="Preview">
-  </div>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading your data...</div>
+    </div>
 
-  <!-- Loading Overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="spinner"></div>
-    <div class="loading-text">Loading your study data...</div>
-  </div>
+    <!-- Firebase SDK (v9 compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- Firebase SDK (v9 compat) -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-  <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
+
 </html>

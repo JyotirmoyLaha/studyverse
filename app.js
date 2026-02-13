@@ -15,7 +15,7 @@ const firebaseConfig = {
     messagingSenderId: "54219323523",
     appId: "1:54219323523:web:0de07d37c14853da9dc3b6",
     measurementId: "G-6H4WG9CS5G"
-  };
+};
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -27,128 +27,131 @@ let currentUser = null;
 let editingEntryId = null;
 let uploadedImages = [];
 let allEntries = [];
+let currentEntryType = 'study';   // 'study' or 'life'
+let currentFilter = 'all';        // 'all', 'study', or 'life'
+let selectedMood = '';
 
 // ============================================
 // PARTICLE ANIMATION SYSTEM
 // ============================================
 class ParticleSystem {
-  constructor(canvas) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
-    this.particles = [];
-    this.mouse = { x: 0, y: 0 };
-    this.resize();
-    this.init();
-    this.bindEvents();
-    this.animate();
-  }
-
-  resize() {
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
-  }
-
-  init() {
-    const count = Math.min(80, Math.floor((this.canvas.width * this.canvas.height) / 15000));
-    this.particles = [];
-    for (let i = 0; i < count; i++) {
-      this.particles.push({
-        x: Math.random() * this.canvas.width,
-        y: Math.random() * this.canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2.5 + 0.5,
-        opacity: Math.random() * 0.5 + 0.1,
-        color: this.getRandomColor(),
-        pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: Math.random() * 0.02 + 0.01,
-      });
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.particles = [];
+        this.mouse = { x: 0, y: 0 };
+        this.resize();
+        this.init();
+        this.bindEvents();
+        this.animate();
     }
-  }
 
-  getRandomColor() {
-    const colors = [
-      'rgba(108, 92, 231,',   // purple
-      'rgba(162, 155, 254,',  // light purple
-      'rgba(0, 206, 201,',    // teal
-      'rgba(253, 121, 168,',  // pink
-      'rgba(253, 203, 110,',  // yellow
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
-  }
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
 
-  bindEvents() {
-    window.addEventListener('resize', () => {
-      this.resize();
-      this.init();
-    });
-    window.addEventListener('mousemove', (e) => {
-      this.mouse.x = e.clientX;
-      this.mouse.y = e.clientY;
-    });
-  }
-
-  animate() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    for (let i = 0; i < this.particles.length; i++) {
-      const p = this.particles[i];
-
-      // Update
-      p.x += p.vx;
-      p.y += p.vy;
-      p.pulse += p.pulseSpeed;
-
-      // Wrap around edges
-      if (p.x < -10) p.x = this.canvas.width + 10;
-      if (p.x > this.canvas.width + 10) p.x = -10;
-      if (p.y < -10) p.y = this.canvas.height + 10;
-      if (p.y > this.canvas.height + 10) p.y = -10;
-
-      // Pulsing opacity
-      const pulsedOpacity = p.opacity + Math.sin(p.pulse) * 0.15;
-
-      // Draw particle
-      this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      this.ctx.fillStyle = p.color + ' ' + Math.max(0, pulsedOpacity) + ')';
-      this.ctx.fill();
-
-      // Draw connections
-      for (let j = i + 1; j < this.particles.length; j++) {
-        const p2 = this.particles[j];
-        const dx = p.x - p2.x;
-        const dy = p.y - p2.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < 150) {
-          const lineOpacity = (1 - dist / 150) * 0.15;
-          this.ctx.beginPath();
-          this.ctx.moveTo(p.x, p.y);
-          this.ctx.lineTo(p2.x, p2.y);
-          this.ctx.strokeStyle = `rgba(108, 92, 231, ${lineOpacity})`;
-          this.ctx.lineWidth = 0.5;
-          this.ctx.stroke();
+    init() {
+        const count = Math.min(80, Math.floor((this.canvas.width * this.canvas.height) / 15000));
+        this.particles = [];
+        for (let i = 0; i < count; i++) {
+            this.particles.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 2.5 + 0.5,
+                opacity: Math.random() * 0.5 + 0.1,
+                color: this.getRandomColor(),
+                pulse: Math.random() * Math.PI * 2,
+                pulseSpeed: Math.random() * 0.02 + 0.01,
+            });
         }
-      }
-
-      // Mouse interaction
-      const mdx = p.x - this.mouse.x;
-      const mdy = p.y - this.mouse.y;
-      const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-      if (mDist < 120) {
-        const force = (120 - mDist) / 120;
-        p.vx += (mdx / mDist) * force * 0.03;
-        p.vy += (mdy / mDist) * force * 0.03;
-      }
-
-      // Speed damping
-      p.vx *= 0.99;
-      p.vy *= 0.99;
     }
 
-    requestAnimationFrame(() => this.animate());
-  }
+    getRandomColor() {
+        const colors = [
+            'rgba(108, 92, 231,',   // purple
+            'rgba(162, 155, 254,',  // light purple
+            'rgba(0, 206, 201,',    // teal
+            'rgba(253, 121, 168,',  // pink
+            'rgba(253, 203, 110,',  // yellow
+        ];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    bindEvents() {
+        window.addEventListener('resize', () => {
+            this.resize();
+            this.init();
+        });
+        window.addEventListener('mousemove', (e) => {
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+        });
+    }
+
+    animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        for (let i = 0; i < this.particles.length; i++) {
+            const p = this.particles[i];
+
+            // Update
+            p.x += p.vx;
+            p.y += p.vy;
+            p.pulse += p.pulseSpeed;
+
+            // Wrap around edges
+            if (p.x < -10) p.x = this.canvas.width + 10;
+            if (p.x > this.canvas.width + 10) p.x = -10;
+            if (p.y < -10) p.y = this.canvas.height + 10;
+            if (p.y > this.canvas.height + 10) p.y = -10;
+
+            // Pulsing opacity
+            const pulsedOpacity = p.opacity + Math.sin(p.pulse) * 0.15;
+
+            // Draw particle
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = p.color + ' ' + Math.max(0, pulsedOpacity) + ')';
+            this.ctx.fill();
+
+            // Draw connections
+            for (let j = i + 1; j < this.particles.length; j++) {
+                const p2 = this.particles[j];
+                const dx = p.x - p2.x;
+                const dy = p.y - p2.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 150) {
+                    const lineOpacity = (1 - dist / 150) * 0.15;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(p.x, p.y);
+                    this.ctx.lineTo(p2.x, p2.y);
+                    this.ctx.strokeStyle = `rgba(108, 92, 231, ${lineOpacity})`;
+                    this.ctx.lineWidth = 0.5;
+                    this.ctx.stroke();
+                }
+            }
+
+            // Mouse interaction
+            const mdx = p.x - this.mouse.x;
+            const mdy = p.y - this.mouse.y;
+            const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+            if (mDist < 120) {
+                const force = (120 - mDist) / 120;
+                p.vx += (mdx / mDist) * force * 0.03;
+                p.vy += (mdy / mDist) * force * 0.03;
+            }
+
+            // Speed damping
+            p.vx *= 0.99;
+            p.vy *= 0.99;
+        }
+
+        requestAnimationFrame(() => this.animate());
+    }
 }
 
 // Init particles on load
@@ -159,205 +162,327 @@ const particleSystem = new ParticleSystem(particleCanvas);
 // AUTHENTICATION
 // ============================================
 function signInWithGoogle() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  showLoading(true);
-  auth.signInWithPopup(provider)
-    .then(() => {
-      showToast('Welcome back! 🎉', 'success');
-    })
-    .catch((error) => {
-      console.error('Auth error:', error);
-      showToast('Sign-in failed: ' + error.message, 'error');
-      showLoading(false);
-    });
+    const provider = new firebase.auth.GoogleAuthProvider();
+    showLoading(true);
+    auth.signInWithPopup(provider)
+        .then(() => {
+            showToast('Welcome back! 🎉', 'success');
+        })
+        .catch((error) => {
+            console.error('Auth error:', error);
+            showToast('Sign-in failed: ' + error.message, 'error');
+            showLoading(false);
+        });
 }
 
 function signOutUser() {
-  auth.signOut()
-    .then(() => {
-      showToast('Signed out successfully', 'info');
-    })
-    .catch((error) => {
-      showToast('Error signing out', 'error');
-    });
+    auth.signOut()
+        .then(() => {
+            showToast('Signed out successfully', 'info');
+        })
+        .catch((error) => {
+            showToast('Error signing out', 'error');
+        });
 }
 
 // Auth state observer
 auth.onAuthStateChanged((user) => {
-  if (user) {
-    currentUser = user;
-    showDashboard(user);
-    loadEntries();
-  } else {
-    currentUser = null;
-    showLogin();
-  }
+    if (user) {
+        currentUser = user;
+        showDashboard(user);
+        loadEntries();
+    } else {
+        currentUser = null;
+        showLogin();
+    }
 });
 
 function showLogin() {
-  document.getElementById('loginPage').style.display = 'flex';
-  document.getElementById('dashboard').classList.remove('active');
-  showLoading(false);
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('dashboard').classList.remove('active');
+    showLoading(false);
 }
 
 function showDashboard(user) {
-  document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('dashboard').classList.add('active');
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboard').classList.add('active');
 
-  document.getElementById('userName').textContent = user.displayName || 'Student';
-  document.getElementById('userEmail').textContent = user.email;
-  document.getElementById('userAvatar').src = user.photoURL || 'https://via.placeholder.com/40';
+    document.getElementById('userName').textContent = user.displayName || 'Student';
+    document.getElementById('userEmail').textContent = user.email;
+    document.getElementById('userAvatar').src = user.photoURL || 'https://via.placeholder.com/40';
 
-  showLoading(false);
+    showLoading(false);
+}
+
+// ============================================
+// ENTRY TYPE TOGGLE
+// ============================================
+function setEntryType(type) {
+    currentEntryType = type;
+
+    // Toggle buttons
+    document.getElementById('toggleStudy').classList.toggle('active', type === 'study');
+    document.getElementById('toggleLife').classList.toggle('active', type === 'life');
+
+    // Toggle field sections
+    document.getElementById('studyFields').classList.toggle('active', type === 'study');
+    document.getElementById('lifeFields').classList.toggle('active', type === 'life');
+
+    // Update modal title
+    if (!editingEntryId) {
+        document.getElementById('modalTitleText').textContent =
+            type === 'study' ? 'New Study Entry' : 'New Life Entry';
+    }
+}
+
+// ============================================
+// MOOD SELECTOR
+// ============================================
+function selectMood(element, mood) {
+    // Deselect all
+    document.querySelectorAll('.mood-option').forEach(el => el.classList.remove('selected'));
+    // Select this one
+    element.classList.add('selected');
+    selectedMood = mood;
+}
+
+// ============================================
+// FILTER TABS
+// ============================================
+function filterEntries(filter) {
+    currentFilter = filter;
+
+    // Update tab styling
+    document.getElementById('tabAll').classList.toggle('active', filter === 'all');
+    document.getElementById('tabStudy').classList.toggle('active', filter === 'study');
+    document.getElementById('tabLife').classList.toggle('active', filter === 'life');
+
+    renderEntries();
 }
 
 // ============================================
 // FIRESTORE CRUD OPERATIONS
 // ============================================
 function getUserEntriesRef() {
-  return db.collection('users').doc(currentUser.uid).collection('entries');
+    return db.collection('users').doc(currentUser.uid).collection('entries');
 }
 
 async function loadEntries() {
-  if (!currentUser) return;
+    if (!currentUser) return;
 
-  try {
-    const snapshot = await getUserEntriesRef()
-      .orderBy('date', 'desc')
-      .get();
+    try {
+        const snapshot = await getUserEntriesRef()
+            .orderBy('date', 'desc')
+            .get();
 
-    allEntries = [];
-    snapshot.forEach((doc) => {
-      allEntries.push({ id: doc.id, ...doc.data() });
-    });
+        allEntries = [];
+        snapshot.forEach((doc) => {
+            allEntries.push({ id: doc.id, ...doc.data() });
+        });
 
-    renderEntries();
-    updateStats();
-  } catch (error) {
-    console.error('Error loading entries:', error);
-    showToast('Error loading entries. Check your Firebase config.', 'error');
-  }
+        renderEntries();
+        updateStats();
+    } catch (error) {
+        console.error('Error loading entries:', error);
+        showToast('Error loading entries. Check your Firebase config.', 'error');
+    }
 }
 
 async function saveEntry() {
-  if (!currentUser) return;
+    if (!currentUser) return;
 
-  const date = document.getElementById('entryDate').value;
-  const subject = document.getElementById('entrySubject').value.trim();
-  const text = document.getElementById('entryText').value.trim();
-  const progress = document.getElementById('entryProgress').value;
+    const date = document.getElementById('entryDate').value;
 
-  if (!date || !text) {
-    showToast('Please fill in the date and study notes.', 'error');
-    return;
-  }
-
-  const btnSave = document.getElementById('btnSave');
-  btnSave.disabled = true;
-  btnSave.textContent = 'Saving...';
-
-  const entryData = {
-    date: date,
-    subject: subject,
-    text: text,
-    progress: progress,
-    images: uploadedImages.slice(),
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  };
-
-  try {
-    if (editingEntryId) {
-      // Update existing
-      delete entryData.createdAt;
-      await getUserEntriesRef().doc(editingEntryId).update(entryData);
-      showToast('Entry updated! ✏️', 'success');
-    } else {
-      // Create new
-      await getUserEntriesRef().add(entryData);
-      showToast('Entry saved! 🎉', 'success');
+    if (!date) {
+        showToast('Please select a date.', 'error');
+        return;
     }
 
-    closeModal();
-    await loadEntries();
-  } catch (error) {
-    console.error('Error saving entry:', error);
-    showToast('Error saving entry: ' + error.message, 'error');
-  } finally {
-    btnSave.disabled = false;
-    btnSave.textContent = 'Save Entry';
-  }
+    const btnSave = document.getElementById('btnSave');
+    btnSave.disabled = true;
+    btnSave.textContent = 'Saving...';
+
+    let entryData;
+
+    if (currentEntryType === 'study') {
+        const subject = document.getElementById('entrySubject').value.trim();
+        const text = document.getElementById('entryText').value.trim();
+        const progress = document.getElementById('entryProgress').value;
+
+        if (!text) {
+            showToast('Please write about what you studied.', 'error');
+            btnSave.disabled = false;
+            btnSave.textContent = 'Save Entry';
+            return;
+        }
+
+        entryData = {
+            type: 'study',
+            date: date,
+            subject: subject,
+            text: text,
+            progress: progress,
+            images: uploadedImages.slice(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+    } else {
+        const lifeTitle = document.getElementById('lifeTitle').value.trim();
+        const lifeText = document.getElementById('lifeText').value.trim();
+
+        if (!lifeText) {
+            showToast('Please write about your day.', 'error');
+            btnSave.disabled = false;
+            btnSave.textContent = 'Save Entry';
+            return;
+        }
+
+        entryData = {
+            type: 'life',
+            date: date,
+            lifeTitle: lifeTitle,
+            text: lifeText,
+            mood: selectedMood,
+            images: uploadedImages.slice(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+    }
+
+    try {
+        if (editingEntryId) {
+            // Update existing
+            delete entryData.createdAt;
+            await getUserEntriesRef().doc(editingEntryId).update(entryData);
+            showToast('Entry updated! ✏️', 'success');
+        } else {
+            // Create new
+            await getUserEntriesRef().add(entryData);
+            showToast('Entry saved! 🎉', 'success');
+        }
+
+        closeModal();
+        await loadEntries();
+    } catch (error) {
+        console.error('Error saving entry:', error);
+        showToast('Error saving entry: ' + error.message, 'error');
+    } finally {
+        btnSave.disabled = false;
+        btnSave.textContent = 'Save Entry';
+    }
 }
 
 async function deleteEntry(entryId) {
-  if (!confirm('Are you sure you want to delete this entry?')) return;
+    if (!confirm('Are you sure you want to delete this entry?')) return;
 
-  try {
-    await getUserEntriesRef().doc(entryId).delete();
-    showToast('Entry deleted 🗑️', 'info');
-    await loadEntries();
-  } catch (error) {
-    console.error('Error deleting entry:', error);
-    showToast('Error deleting entry', 'error');
-  }
+    try {
+        await getUserEntriesRef().doc(entryId).delete();
+        showToast('Entry deleted 🗑️', 'info');
+        await loadEntries();
+    } catch (error) {
+        console.error('Error deleting entry:', error);
+        showToast('Error deleting entry', 'error');
+    }
 }
 
 function editEntry(entryId) {
-  const entry = allEntries.find(e => e.id === entryId);
-  if (!entry) return;
+    const entry = allEntries.find(e => e.id === entryId);
+    if (!entry) return;
 
-  editingEntryId = entryId;
-  document.getElementById('modalTitleText').textContent = 'Edit Entry';
-  document.getElementById('entryDate').value = entry.date;
-  document.getElementById('entrySubject').value = entry.subject || '';
-  document.getElementById('entryText').value = entry.text || '';
-  document.getElementById('entryProgress').value = entry.progress || 'in-progress';
+    editingEntryId = entryId;
+    const entryType = entry.type || 'study';
+    setEntryType(entryType);
 
-  uploadedImages = entry.images ? [...entry.images] : [];
-  renderImagePreviews();
+    document.getElementById('modalTitleText').textContent = 'Edit Entry';
+    document.getElementById('entryDate').value = entry.date;
 
-  document.getElementById('entryModal').classList.add('active');
+    if (entryType === 'study') {
+        document.getElementById('entrySubject').value = entry.subject || '';
+        document.getElementById('entryText').value = entry.text || '';
+        document.getElementById('entryProgress').value = entry.progress || 'in-progress';
+    } else {
+        document.getElementById('lifeTitle').value = entry.lifeTitle || '';
+        document.getElementById('lifeText').value = entry.text || '';
+        selectedMood = entry.mood || '';
+        // Highlight the matching mood button
+        document.querySelectorAll('.mood-option').forEach(el => {
+            el.classList.toggle('selected', selectedMood && el.textContent.trim() === selectedMood.trim());
+        });
+    }
+
+    uploadedImages = entry.images ? [...entry.images] : [];
+    renderImagePreviews();
+
+    document.getElementById('entryModal').classList.add('active');
 }
 
 // ============================================
 // RENDERING
 // ============================================
 function renderEntries() {
-  const feed = document.getElementById('entriesFeed');
-  const emptyState = document.getElementById('emptyState');
+    const feed = document.getElementById('entriesFeed');
 
-  if (allEntries.length === 0) {
+    // Filter entries
+    let filtered = allEntries;
+    if (currentFilter === 'study') {
+        filtered = allEntries.filter(e => (e.type || 'study') === 'study');
+    } else if (currentFilter === 'life') {
+        filtered = allEntries.filter(e => e.type === 'life');
+    }
+
+    if (filtered.length === 0) {
+        feed.innerHTML = '';
+        feed.appendChild(createEmptyState());
+        return;
+    }
+
     feed.innerHTML = '';
-    feed.appendChild(createEmptyState());
-    return;
-  }
 
-  feed.innerHTML = '';
+    filtered.forEach((entry, index) => {
+        const card = document.createElement('div');
+        const entryType = entry.type || 'study';
+        card.className = 'entry-card' + (entryType === 'life' ? ' life-entry' : '');
+        card.style.animationDelay = `${index * 0.08}s`;
 
-  allEntries.forEach((entry, index) => {
-    const card = document.createElement('div');
-    card.className = 'entry-card';
-    card.style.animationDelay = `${index * 0.08}s`;
+        const formattedDate = formatDate(entry.date);
 
-    const progressEmoji = getProgressEmoji(entry.progress);
-    const formattedDate = formatDate(entry.date);
+        let bodyHTML = '';
+        let tagsHTML = '';
 
-    let imagesHTML = '';
-    if (entry.images && entry.images.length > 0) {
-      imagesHTML = `<div class="entry-images">
-        ${entry.images.map(img => `<img class="entry-image" src="${img}" alt="Study image" onclick="openLightbox('${img.replace(/'/g, "\\'")}')">`).join('')}
+        if (entryType === 'study') {
+            const progressEmoji = getProgressEmoji(entry.progress);
+            bodyHTML = `<div class="entry-text">${escapeHtml(entry.text)}</div>`;
+            if (entry.subject) {
+                tagsHTML = `
+          <span class="entry-tag type-tag">📖 Study</span>
+          <span class="entry-tag">${escapeHtml(entry.subject)}</span>
+          <span class="entry-tag">${progressEmoji}</span>
+        `;
+            } else {
+                tagsHTML = `<span class="entry-tag type-tag">📖 Study</span>`;
+            }
+        } else {
+            // Daily life
+            let moodTag = '';
+            if (entry.mood) {
+                moodTag = `<span class="entry-tag">${escapeHtml(entry.mood)}</span>`;
+            }
+            const titleLine = entry.lifeTitle ? `<strong>${escapeHtml(entry.lifeTitle)}</strong><br>` : '';
+            bodyHTML = `<div class="entry-text">${titleLine}${escapeHtml(entry.text)}</div>`;
+            tagsHTML = `
+        <span class="entry-tag type-tag">🌟 Life</span>
+        ${moodTag}
+      `;
+        }
+
+        let imagesHTML = '';
+        if (entry.images && entry.images.length > 0) {
+            imagesHTML = `<div class="entry-images">
+        ${entry.images.map(img => `<img class="entry-image" src="${img}" alt="Image" onclick="openLightbox('${img.replace(/'/g, "\\'")}')">`).join('')}
       </div>`;
-    }
+        }
 
-    let tagsHTML = '';
-    if (entry.subject) {
-      tagsHTML = `<div class="entry-tags">
-        <span class="entry-tag">${escapeHtml(entry.subject)}</span>
-        <span class="entry-tag">${progressEmoji}</span>
-      </div>`;
-    }
-
-    card.innerHTML = `
+        card.innerHTML = `
       <div class="entry-header">
         <div class="entry-date">
           <span class="icon">📅</span> ${formattedDate}
@@ -368,151 +493,161 @@ function renderEntries() {
         </div>
       </div>
       <div class="entry-body">
-        <div class="entry-text">${escapeHtml(entry.text)}</div>
+        ${bodyHTML}
         ${imagesHTML}
       </div>
-      ${tagsHTML}
+      <div class="entry-tags">
+        ${tagsHTML}
+      </div>
     `;
 
-    feed.appendChild(card);
-  });
+        feed.appendChild(card);
+    });
 }
 
 function createEmptyState() {
-  const div = document.createElement('div');
-  div.className = 'empty-state';
-  div.innerHTML = `
+    const div = document.createElement('div');
+    div.className = 'empty-state';
+
+    let msg = 'Add your first entry and begin tracking your progress today.';
+    if (currentFilter === 'study') {
+        msg = 'No study entries yet. Start logging what you learn each day!';
+    } else if (currentFilter === 'life') {
+        msg = 'No life entries yet. Start capturing your daily moments!';
+    }
+
+    div.innerHTML = `
     <div class="empty-icon">🚀</div>
     <h3 class="empty-title">Start Your Journey!</h3>
-    <p class="empty-text">Add your first study entry and begin tracking your progress today.</p>
+    <p class="empty-text">${msg}</p>
   `;
-  return div;
+    return div;
 }
 
 function updateStats() {
-  const totalEntries = allEntries.length;
-  const totalImages = allEntries.reduce((sum, e) => sum + (e.images ? e.images.length : 0), 0);
+    const studyEntries = allEntries.filter(e => (e.type || 'study') === 'study').length;
+    const lifeEntries = allEntries.filter(e => e.type === 'life').length;
+    const totalImages = allEntries.reduce((sum, e) => sum + (e.images ? e.images.length : 0), 0);
 
-  // Calculate streak
-  const streak = calculateStreak();
+    // Calculate streak
+    const streak = calculateStreak();
 
-  // This week entries
-  const now = new Date();
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - now.getDay());
-  startOfWeek.setHours(0, 0, 0, 0);
-  const thisWeek = allEntries.filter(e => new Date(e.date) >= startOfWeek).length;
+    // Animate counters
+    animateCounter('statTotalEntries', studyEntries);
+    animateCounter('statStreak', streak);
+    animateCounter('statLifeEntries', lifeEntries);
+    animateCounter('statImages', totalImages);
 
-  // Animate counter
-  animateCounter('statTotalEntries', totalEntries);
-  animateCounter('statStreak', streak);
-  animateCounter('statImages', totalImages);
-  animateCounter('statThisWeek', thisWeek);
+    // Progress bar (monthly goal = 30 entries)
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const monthEntries = allEntries.filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    }).length;
 
-  // Progress bar (monthly goal = 30 entries)
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
-  const monthEntries = allEntries.filter(e => {
-    const d = new Date(e.date);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-  }).length;
+    const goalEntries = 30;
+    const percent = Math.min(100, Math.round((monthEntries / goalEntries) * 100));
 
-  const goalEntries = 30;
-  const percent = Math.min(100, Math.round((monthEntries / goalEntries) * 100));
-
-  document.getElementById('progressPercent').textContent = percent + '%';
-  document.getElementById('progressBar').style.width = percent + '%';
-  document.getElementById('progressDone').textContent = monthEntries;
-  document.getElementById('progressGoal').textContent = goalEntries;
+    document.getElementById('progressPercent').textContent = percent + '%';
+    document.getElementById('progressBar').style.width = percent + '%';
+    document.getElementById('progressDone').textContent = monthEntries;
+    document.getElementById('progressGoal').textContent = goalEntries;
 }
 
 function calculateStreak() {
-  if (allEntries.length === 0) return 0;
+    if (allEntries.length === 0) return 0;
 
-  // Get unique dates sorted descending
-  const dates = [...new Set(allEntries.map(e => e.date))].sort().reverse();
+    // Get unique dates sorted descending
+    const dates = [...new Set(allEntries.map(e => e.date))].sort().reverse();
 
-  let streak = 0;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  for (let i = 0; i < dates.length; i++) {
-    const entryDate = new Date(dates[i]);
-    entryDate.setHours(0, 0, 0, 0);
+    for (let i = 0; i < dates.length; i++) {
+        const entryDate = new Date(dates[i]);
+        entryDate.setHours(0, 0, 0, 0);
 
-    const expectedDate = new Date(today);
-    expectedDate.setDate(today.getDate() - i);
-    expectedDate.setHours(0, 0, 0, 0);
+        const expectedDate = new Date(today);
+        expectedDate.setDate(today.getDate() - i);
+        expectedDate.setHours(0, 0, 0, 0);
 
-    if (entryDate.getTime() === expectedDate.getTime()) {
-      streak++;
-    } else if (i === 0 && entryDate.getTime() === expectedDate.getTime() - 86400000) {
-      // Yesterday counts too for streak start
-      const yesterdayExpected = new Date(today);
-      yesterdayExpected.setDate(today.getDate() - 1);
-      yesterdayExpected.setHours(0, 0, 0, 0);
-      if (entryDate.getTime() === yesterdayExpected.getTime()) {
-        streak++;
-      } else {
-        break;
-      }
-    } else {
-      break;
+        if (entryDate.getTime() === expectedDate.getTime()) {
+            streak++;
+        } else if (i === 0) {
+            // Check if yesterday is the start
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            yesterday.setHours(0, 0, 0, 0);
+            if (entryDate.getTime() === yesterday.getTime()) {
+                streak++;
+            } else {
+                break;
+            }
+        } else {
+            break;
+        }
     }
-  }
 
-  return streak;
+    return streak;
 }
 
 function animateCounter(elementId, target) {
-  const element = document.getElementById(elementId);
-  const current = parseInt(element.textContent) || 0;
-  if (current === target) return;
+    const element = document.getElementById(elementId);
+    const current = parseInt(element.textContent) || 0;
+    if (current === target) return;
 
-  const duration = 800;
-  const start = performance.now();
+    const duration = 800;
+    const start = performance.now();
 
-  function update(now) {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-    const value = Math.round(current + (target - current) * eased);
-    element.textContent = value;
+    function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        const value = Math.round(current + (target - current) * eased);
+        element.textContent = value;
 
-    if (progress < 1) {
-      requestAnimationFrame(update);
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
     }
-  }
 
-  requestAnimationFrame(update);
+    requestAnimationFrame(update);
 }
 
 // ============================================
 // MODAL
 // ============================================
 function openModal() {
-  editingEntryId = null;
-  document.getElementById('modalTitleText').textContent = 'New Study Entry';
-  document.getElementById('entryDate').value = getTodayDate();
-  document.getElementById('entrySubject').value = '';
-  document.getElementById('entryText').value = '';
-  document.getElementById('entryProgress').value = 'in-progress';
-  uploadedImages = [];
-  renderImagePreviews();
+    editingEntryId = null;
+    setEntryType('study');
+    document.getElementById('modalTitleText').textContent = 'New Entry';
+    document.getElementById('entryDate').value = getTodayDate();
+    document.getElementById('entrySubject').value = '';
+    document.getElementById('entryText').value = '';
+    document.getElementById('entryProgress').value = 'in-progress';
+    document.getElementById('lifeTitle').value = '';
+    document.getElementById('lifeText').value = '';
+    selectedMood = '';
+    document.querySelectorAll('.mood-option').forEach(el => el.classList.remove('selected'));
+    uploadedImages = [];
+    renderImagePreviews();
 
-  document.getElementById('entryModal').classList.add('active');
+    document.getElementById('entryModal').classList.add('active');
 }
 
 function closeModal() {
-  document.getElementById('entryModal').classList.remove('active');
-  editingEntryId = null;
-  uploadedImages = [];
-  renderImagePreviews();
+    document.getElementById('entryModal').classList.remove('active');
+    editingEntryId = null;
+    uploadedImages = [];
+    renderImagePreviews();
 }
 
 // Close modal on overlay click
-document.getElementById('entryModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
+document.getElementById('entryModal').addEventListener('click', function (e) {
+    if (e.target === this) closeModal();
 });
 
 // ============================================
@@ -524,178 +659,178 @@ const imageInput = document.getElementById('imageInput');
 uploadArea.addEventListener('click', () => imageInput.click());
 
 uploadArea.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  uploadArea.classList.add('dragover');
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
 });
 
 uploadArea.addEventListener('dragleave', () => {
-  uploadArea.classList.remove('dragover');
+    uploadArea.classList.remove('dragover');
 });
 
 uploadArea.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadArea.classList.remove('dragover');
-  handleFiles(e.dataTransfer.files);
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
 });
 
 imageInput.addEventListener('change', (e) => {
-  handleFiles(e.target.files);
-  imageInput.value = '';
+    handleFiles(e.target.files);
+    imageInput.value = '';
 });
 
 function handleFiles(files) {
-  const remaining = 3 - uploadedImages.length;
-  if (remaining <= 0) {
-    showToast('Maximum 3 images per entry', 'error');
-    return;
-  }
-
-  const filesToProcess = Array.from(files).slice(0, remaining);
-
-  filesToProcess.forEach(file => {
-    if (file.size > 2 * 1024 * 1024) {
-      showToast(`${file.name} is too large (max 2MB)`, 'error');
-      return;
+    const remaining = 3 - uploadedImages.length;
+    if (remaining <= 0) {
+        showToast('Maximum 3 images per entry', 'error');
+        return;
     }
 
-    compressAndAddImage(file);
-  });
+    const filesToProcess = Array.from(files).slice(0, remaining);
+
+    filesToProcess.forEach(file => {
+        if (file.size > 2 * 1024 * 1024) {
+            showToast(`${file.name} is too large (max 2MB)`, 'error');
+            return;
+        }
+
+        compressAndAddImage(file);
+    });
 }
 
 function compressAndAddImage(file) {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      // Compress
-      const canvas = document.createElement('canvas');
-      const maxDim = 800;
-      let w = img.width;
-      let h = img.height;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            // Compress
+            const canvas = document.createElement('canvas');
+            const maxDim = 800;
+            let w = img.width;
+            let h = img.height;
 
-      if (w > maxDim || h > maxDim) {
-        if (w > h) {
-          h = (h / w) * maxDim;
-          w = maxDim;
-        } else {
-          w = (w / h) * maxDim;
-          h = maxDim;
-        }
-      }
+            if (w > maxDim || h > maxDim) {
+                if (w > h) {
+                    h = (h / w) * maxDim;
+                    w = maxDim;
+                } else {
+                    w = (w / h) * maxDim;
+                    h = maxDim;
+                }
+            }
 
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
 
-      const compressed = canvas.toDataURL('image/jpeg', 0.6);
-      uploadedImages.push(compressed);
-      renderImagePreviews();
+            const compressed = canvas.toDataURL('image/jpeg', 0.6);
+            uploadedImages.push(compressed);
+            renderImagePreviews();
+        };
+        img.src = e.target.result;
     };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
 }
 
 function renderImagePreviews() {
-  const container = document.getElementById('imagePreviews');
-  container.innerHTML = '';
+    const container = document.getElementById('imagePreviews');
+    container.innerHTML = '';
 
-  uploadedImages.forEach((src, index) => {
-    const div = document.createElement('div');
-    div.className = 'image-preview';
-    div.innerHTML = `
+    uploadedImages.forEach((src, index) => {
+        const div = document.createElement('div');
+        div.className = 'image-preview';
+        div.innerHTML = `
       <img src="${src}" alt="Preview">
       <button class="remove-btn" onclick="removeImage(${index})">✕</button>
     `;
-    container.appendChild(div);
-  });
+        container.appendChild(div);
+    });
 }
 
 function removeImage(index) {
-  uploadedImages.splice(index, 1);
-  renderImagePreviews();
+    uploadedImages.splice(index, 1);
+    renderImagePreviews();
 }
 
 // ============================================
 // LIGHTBOX
 // ============================================
 function openLightbox(src) {
-  document.getElementById('lightboxImage').src = src;
-  document.getElementById('lightbox').classList.add('active');
+    document.getElementById('lightboxImage').src = src;
+    document.getElementById('lightbox').classList.add('active');
 }
 
 function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('active');
+    document.getElementById('lightbox').classList.remove('active');
 }
 
 // Close lightbox on Escape
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeLightbox();
-    closeModal();
-  }
+    if (e.key === 'Escape') {
+        closeLightbox();
+        closeModal();
+    }
 });
 
 // ============================================
 // TOAST NOTIFICATIONS
 // ============================================
 function showToast(message, type = 'info') {
-  const container = document.getElementById('toastContainer');
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
 
-  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
-  toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span> ${message}`;
+    const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+    toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span> ${message}`;
 
-  container.appendChild(toast);
+    container.appendChild(toast);
 
-  setTimeout(() => {
-    toast.classList.add('removing');
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
+    setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
 }
 
 // ============================================
 // LOADING
 // ============================================
 function showLoading(show) {
-  const overlay = document.getElementById('loadingOverlay');
-  if (show) {
-    overlay.classList.add('active');
-  } else {
-    overlay.classList.remove('active');
-  }
+    const overlay = document.getElementById('loadingOverlay');
+    if (show) {
+        overlay.classList.add('active');
+    } else {
+        overlay.classList.remove('active');
+    }
 }
 
 // ============================================
 // HELPERS
 // ============================================
 function getTodayDate() {
-  const d = new Date();
-  return d.getFullYear() + '-' +
-    String(d.getMonth() + 1).padStart(2, '0') + '-' +
-    String(d.getDate()).padStart(2, '0');
+    const d = new Date();
+    return d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
 }
 
 function formatDate(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  return d.toLocaleDateString('en-US', options);
+    const d = new Date(dateStr + 'T00:00:00');
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return d.toLocaleDateString('en-US', options);
 }
 
 function getProgressEmoji(progress) {
-  const map = {
-    'just-started': '🌱 Just Started',
-    'in-progress': '📖 In Progress',
-    'almost-done': '🔥 Almost Done',
-    'completed': '✅ Completed',
-  };
-  return map[progress] || '📖 In Progress';
+    const map = {
+        'just-started': '🌱 Just Started',
+        'in-progress': '📖 In Progress',
+        'almost-done': '🔥 Almost Done',
+        'completed': '✅ Completed',
+    };
+    return map[progress] || '📖 In Progress';
 }
 
 function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
