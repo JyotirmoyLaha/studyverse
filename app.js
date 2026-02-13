@@ -6,10 +6,22 @@
 // If you see errors, make sure config.js exists with your firebaseConfig.
 // See config.example.js for the template.
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+let auth, db;
+try {
+    if (typeof firebaseConfig === 'undefined') {
+        throw new Error('config.js not found! Copy config.example.js to config.js and add your Firebase keys.');
+    }
+    firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.firestore();
+} catch (err) {
+    console.error('🔥 Firebase init error:', err);
+    document.addEventListener('DOMContentLoaded', () => {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.classList.remove('active');
+        alert('Firebase config error: ' + err.message);
+    });
+}
 
 // ── State ──
 let currentUser = null;
@@ -189,16 +201,26 @@ function signOutUser() {
 }
 
 // Auth state observer
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        currentUser = user;
-        showDashboard(user);
-        loadEntries();
-    } else {
-        currentUser = null;
+if (auth) {
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            currentUser = user;
+            showDashboard(user);
+            loadEntries().catch(err => {
+                console.error('Load entries error:', err);
+                showLoading(false);
+            });
+        } else {
+            currentUser = null;
+            showLogin();
+        }
+    });
+} else {
+    // Firebase didn't init — make sure login page shows
+    document.addEventListener('DOMContentLoaded', () => {
         showLogin();
-    }
-});
+    });
+}
 
 function showLogin() {
     document.getElementById('loginPage').style.display = 'flex';
