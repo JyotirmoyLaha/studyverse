@@ -2,20 +2,9 @@
    StudyVerse — Application Logic
    ============================================ */
 
-// ╔══════════════════════════════════════════════╗
-// ║  🔥 FIREBASE CONFIGURATION                  ║
-// ║  Replace the values below with YOUR config   ║
-// ║  from Firebase Console → Project Settings    ║
-// ╚══════════════════════════════════════════════╝
-const firebaseConfig = {
-    apiKey: "AIzaSyBzzz-p9O3b6cFSmak_llQaVVavMkMhKnw",
-    authDomain: "studyverse-80992.firebaseapp.com",
-    projectId: "studyverse-80992",
-    storageBucket: "studyverse-80992.firebasestorage.app",
-    messagingSenderId: "54219323523",
-    appId: "1:54219323523:web:0de07d37c14853da9dc3b6",
-    measurementId: "G-6H4WG9CS5G"
-};
+// ── Firebase config is loaded from config.js (gitignored) ──
+// If you see errors, make sure config.js exists with your firebaseConfig.
+// See config.example.js for the template.
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
