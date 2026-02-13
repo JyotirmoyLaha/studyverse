@@ -40,6 +40,35 @@ let currentEntryType = 'study';   // 'study' or 'life'
 let currentFilter = 'all';        // 'all', 'study', or 'life'
 let selectedMood = '';
 
+// ── Theme Toggle ──
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('studyverse-theme', next);
+    updateThemeIcons(next);
+}
+
+function updateThemeIcons(theme) {
+    const icon = theme === 'light' ? '☀️' : '🌙';
+    document.querySelectorAll('.theme-icon').forEach(el => el.textContent = icon);
+}
+
+// Apply saved theme on load
+(function () {
+    const saved = localStorage.getItem('studyverse-theme') || 'dark';
+    if (saved === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+    // Update icons after DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => updateThemeIcons(saved));
+    } else {
+        updateThemeIcons(saved);
+    }
+})();
+
 // ============================================
 // 🌸 SAKURA BLOSSOM PARTICLE SYSTEM
 // ============================================

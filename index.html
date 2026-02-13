@@ -23,6 +23,10 @@
 
         <!-- ====== LOGIN PAGE ====== -->
         <div class="login-page" id="loginPage">
+            <button class="theme-toggle login-theme-toggle" id="loginThemeToggle" onclick="toggleTheme()"
+                title="Toggle light/dark mode">
+                <span class="theme-icon" id="loginThemeIcon">🌙</span>
+            </button>
             <div class="login-card">
                 <div class="login-icon">📚</div>
                 <h1 class="login-title">StudyVerse</h1>
@@ -72,6 +76,10 @@
                     <span class="nav-brand-text">StudyVerse</span>
                 </div>
                 <div class="nav-user">
+                    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"
+                        title="Toggle light/dark mode">
+                        <span class="theme-icon" id="themeIcon">🌙</span>
+                    </button>
                     <div class="nav-user-info">
                         <div class="nav-user-name" id="userName">User</div>
                         <div class="nav-user-email" id="userEmail">user@email.com</div>
