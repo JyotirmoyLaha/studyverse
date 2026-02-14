@@ -217,8 +217,19 @@ function signInWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
     showLoading(true);
     auth.signInWithPopup(provider)
-        .then(() => {
-            showToast('Welcome back! 🎉', 'success');
+        .then((result) => {
+            const user = result.user;
+            const displayName = user.displayName || 'Student';
+            const knownKey = 'studyverse-known-' + user.uid;
+
+            if (localStorage.getItem(knownKey)) {
+                // Returning user (has logged in before)
+                showToast(`Welcome back 🎉, ${displayName}`, 'success');
+            } else {
+                // First-time login
+                localStorage.setItem(knownKey, 'true');
+                showToast(`Welcome! 🎉, ${displayName}`, 'success');
+            }
         })
         .catch((error) => {
             console.error('Auth error:', error);
