@@ -323,27 +323,159 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <!-- Twemoji — iOS-style emojis on all platforms -->
-    <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
-
     <script src="app.js"></script>
 
-    <!-- Parse all emojis to iOS-style SVGs -->
+    <!-- Apple-style Emoji Renderer — Makes all emojis look like iPhone -->
     <script>
-        function parseEmojis() {
-            if (typeof twemoji !== 'undefined') {
-                twemoji.parse(document.body, {
-                    folder: 'svg',
-                    ext: '.svg',
-                    base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/'
-                });
+        (function () {
+            // Apple emoji CDN base URL (uses emoji-datasource-apple)
+            const APPLE_EMOJI_CDN = 'https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/';
+
+            /**
+             * Convert a single emoji character to its codepoint filename.
+             * e.g., "😊" → "1f60a.png", "⛩️" → "26e9-fe0f.png"
+             */
+            function emojiToFilename(emoji) {
+                const codepoints = [];
+                for (const char of emoji) {
+                    const cp = char.codePointAt(0);
+                    // Skip zero-width joiners and variation selectors for matching
+                    if (cp !== 0xFE0F && cp !== 0x200D && cp !== 0x20E3) {
+                        codepoints.push(cp.toString(16));
+                    }
+                }
+                return codepoints.join('-') + '.png';
             }
-        }
-        // Parse on load
-        document.addEventListener('DOMContentLoaded', parseEmojis);
-        // Re-parse when DOM changes (e.g., new entries added)
-        const emojiObserver = new MutationObserver(() => parseEmojis());
-        emojiObserver.observe(document.body, { childList: true, subtree: true });
+
+            /**
+             * Comprehensive emoji regex that matches most common emojis
+             */
+            const emojiRegex = /(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)(?:\u200D(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F))*/gu;
+
+            /**
+             * Track which emoji URLs have been verified to exist
+             */
+            const verifiedEmojis = new Set();
+            const failedEmojis = new Set();
+
+            /**
+             * Parse a single text node & replace emojis with Apple emoji <img> tags
+             */
+            function replaceEmojisInNode(textNode) {
+                const text = textNode.nodeValue;
+                if (!text) return;
+
+                const matches = text.match(emojiRegex);
+                if (!matches) return;
+
+                // Don't process nodes inside <script>, <style>, <textarea>, <input>
+                const parent = textNode.parentNode;
+                if (!parent) return;
+                const tag = parent.tagName;
+                if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
+                // Don't process already-converted emoji images
+                if (parent.classList && parent.classList.contains('apple-emoji-wrap')) return;
+
+                const frag = document.createDocumentFragment();
+                let lastIndex = 0;
+
+                // Reset regex
+                emojiRegex.lastIndex = 0;
+                let match;
+                while ((match = emojiRegex.exec(text)) !== null) {
+                    const emoji = match[0];
+                    const idx = match.index;
+
+                    // Skip if this emoji previously failed
+                    if (failedEmojis.has(emoji)) continue;
+
+                    // Add text before the emoji
+                    if (idx > lastIndex) {
+                        frag.appendChild(document.createTextNode(text.slice(lastIndex, idx)));
+                    }
+
+                    // Create the Apple emoji image
+                    const img = document.createElement('img');
+                    img.className = 'apple-emoji';
+                    img.alt = emoji;
+                    img.draggable = false;
+                    img.loading = 'lazy';
+                    img.src = APPLE_EMOJI_CDN + emojiToFilename(emoji);
+                    img.setAttribute('aria-label', emoji);
+
+                    // Fallback: if image fails to load, show the original emoji
+                    img.onerror = function () {
+                        failedEmojis.add(emoji);
+                        this.replaceWith(document.createTextNode(emoji));
+                    };
+
+                    img.onload = function () {
+                        verifiedEmojis.add(emoji);
+                    };
+
+                    frag.appendChild(img);
+                    lastIndex = idx + emoji.length;
+                }
+
+                // If nothing was actually replaced, skip
+                if (lastIndex === 0) return;
+
+                // Add remaining text
+                if (lastIndex < text.length) {
+                    frag.appendChild(document.createTextNode(text.slice(lastIndex)));
+                }
+
+                parent.replaceChild(frag, textNode);
+            }
+
+            /**
+             * Walk the DOM and replace all emoji text nodes
+             */
+            function parseAppleEmojis(root) {
+                const walker = document.createTreeWalker(
+                    root || document.body,
+                    NodeFilter.SHOW_TEXT,
+                    null,
+                    false
+                );
+
+                const textNodes = [];
+                let node;
+                while (node = walker.nextNode()) {
+                    if (emojiRegex.test(node.nodeValue)) {
+                        textNodes.push(node);
+                    }
+                    emojiRegex.lastIndex = 0;
+                }
+
+                textNodes.forEach(replaceEmojisInNode);
+            }
+
+            // Parse on DOM ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => parseAppleEmojis());
+            } else {
+                parseAppleEmojis();
+            }
+
+            // Re-parse when DOM changes (new entries, toasts, etc.)
+            const emojiObserver = new MutationObserver((mutations) => {
+                for (const mutation of mutations) {
+                    for (const node of mutation.addedNodes) {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            parseAppleEmojis(node);
+                        } else if (node.nodeType === Node.TEXT_NODE && emojiRegex.test(node.nodeValue)) {
+                            emojiRegex.lastIndex = 0;
+                            replaceEmojisInNode(node);
+                        }
+                    }
+                }
+            });
+            emojiObserver.observe(document.body, { childList: true, subtree: true });
+
+            // Expose globally for manual re-parse if needed
+            window.parseAppleEmojis = parseAppleEmojis;
+        })();
     </script>
 </body>
 

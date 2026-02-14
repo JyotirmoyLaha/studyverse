@@ -2635,3 +2635,110 @@ img.emoji {
         opacity: 1;
     }
 }
+
+/* ============================================
+   APPLE EMOJI — iPhone-style emoji rendering
+   ============================================ */
+img.apple-emoji {
+    height: 1.2em;
+    width: 1.2em;
+    margin: 0 0.05em 0 0.1em;
+    vertical-align: -0.15em;
+    display: inline;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Larger emojis in stat icons */
+.stat-icon img.apple-emoji {
+    height: 1.6em;
+    width: 1.6em;
+    vertical-align: middle;
+    margin: 0;
+}
+
+/* Emojis in login icon area */
+.login-icon img.apple-emoji {
+    height: 1em;
+    width: 1em;
+    vertical-align: middle;
+    margin: 0;
+}
+
+/* Emojis in nav brand icon */
+.nav-brand-icon img.apple-emoji {
+    height: 1em;
+    width: 1em;
+    vertical-align: middle;
+    margin: 0;
+}
+
+/* Emojis inside buttons and tabs */
+.section-tab img.apple-emoji,
+.toggle-option img.apple-emoji,
+.mood-option img.apple-emoji {
+    height: 1.15em;
+    width: 1.15em;
+    vertical-align: -0.1em;
+}
+
+/* Emojis in select dropdown */
+.form-select img.apple-emoji,
+select img.apple-emoji,
+option img.apple-emoji {
+    height: 1em;
+    width: 1em;
+}
+
+/* Emojis in empty state */
+.empty-icon img.apple-emoji {
+    height: 1em;
+    width: 1em;
+    margin: 0;
+}
+
+/* Emojis in the upload area */
+.upload-icon img.apple-emoji {
+    height: 1em;
+    width: 1em;
+    margin: 0;
+}
+
+/* Emojis in progress title */
+.progress-title img.apple-emoji {
+    height: 1.1em;
+    width: 1.1em;
+    vertical-align: -0.1em;
+}
+
+/* Emojis in modal title */
+.modal-title img.apple-emoji {
+    height: 1.1em;
+    width: 1.1em;
+    vertical-align: -0.1em;
+}
+
+/* Theme toggle emoji sizing */
+.theme-icon img.apple-emoji {
+    height: 1em;
+    width: 1em;
+    vertical-align: middle;
+    margin: 0;
+}
+
+/* Emojis in entry card badges/tags */
+.entry-tag img.apple-emoji,
+.entry-badge img.apple-emoji,
+.entry-mood img.apple-emoji {
+    height: 1.1em;
+    width: 1.1em;
+    vertical-align: -0.1em;
+}
+
+/* Emojis in toast notifications */
+.toast img.apple-emoji {
+    height: 1.2em;
+    width: 1.2em;
+    vertical-align: -0.1em;
+}
