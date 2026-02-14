@@ -1937,75 +1937,588 @@ body {
 }
 
 /* ============================================
-   RESPONSIVE
+   TWEMOJI — iOS-style emoji sizing
+   ============================================ */
+img.emoji {
+    height: 1.2em;
+    width: 1.2em;
+    margin: 0 0.05em 0 0.1em;
+    vertical-align: -0.15em;
+    display: inline-block;
+    pointer-events: none;
+}
+
+.stat-icon img.emoji {
+    height: 1.6em;
+    width: 1.6em;
+}
+
+.login-icon img.emoji {
+    height: 1.4em;
+    width: 1.4em;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.empty-icon img.emoji {
+    height: 1em;
+    width: 1em;
+}
+
+.mood-option img.emoji {
+    height: 1.3em;
+    width: 1.3em;
+}
+
+.toggle-emoji img.emoji {
+    height: 1.2em;
+    width: 1.2em;
+}
+
+.section-title .icon img.emoji {
+    height: 1.1em;
+    width: 1.1em;
+}
+
+/* ============================================
+   MOBILE TOUCH OPTIMIZATIONS
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    button,
+    a,
+    .mood-option,
+    .toggle-option,
+    .section-tab,
+    .stat-card {
+        touch-action: manipulation;
+    }
+
+    /* Remove hover effects that cause sticky states on mobile */
+    .stat-card:hover {
+        transform: none;
+    }
+
+    .entry-card:hover {
+        transform: none;
+    }
+
+    /* Make tappable items respond with active instead */
+    .stat-card:active {
+        transform: scale(0.97);
+        background: var(--bg-card-hover);
+    }
+
+    .entry-card:active {
+        transform: scale(0.99);
+        background: var(--bg-card-hover);
+    }
+
+    .btn-add:active {
+        transform: scale(0.95);
+    }
+
+    .google-btn:active {
+        transform: scale(0.97);
+    }
+}
+
+/* ============================================
+   RESPONSIVE — TABLET (768px)
    ============================================ */
 @media (max-width: 768px) {
+
+    /* -- Navbar: compact mobile bar -- */
     .navbar {
-        padding: 12px 16px;
-        flex-wrap: wrap;
-        gap: 12px;
+        padding: 10px 16px;
+        gap: 8px;
+    }
+
+    .nav-brand {
+        gap: 10px;
+    }
+
+    .nav-brand-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+        border-radius: 12px;
+    }
+
+    .nav-brand-text {
+        font-size: 16px;
+    }
+
+    .nav-brand-jp {
+        font-size: 8px;
     }
 
     .nav-user-info {
         display: none;
     }
 
-    .main-content {
-        padding: 20px 16px;
+    .nav-user {
+        gap: 10px;
     }
 
+    .theme-toggle {
+        width: 38px;
+        height: 38px;
+    }
+
+    .nav-avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .btn-signout {
+        padding: 7px 16px;
+        font-size: 12px;
+    }
+
+    /* -- Main Content -- */
+    .main-content {
+        padding: 16px 14px;
+    }
+
+    /* -- Stats Row: 2-column grid -- */
     .stats-row {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: 10px;
+        margin-bottom: 24px;
     }
 
     .stat-card {
-        padding: 20px 16px;
+        padding: 18px 14px;
+        border-radius: var(--radius-md);
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        font-size: 22px;
+        margin-bottom: 12px;
     }
 
     .stat-value {
-        font-size: 24px;
+        font-size: 26px;
+        margin-bottom: 2px;
     }
 
-    .section-header {
-        flex-direction: column;
-        align-items: stretch;
+    .stat-label {
+        font-size: 10px;
+        letter-spacing: 1px;
     }
 
-    .btn-add {
-        justify-content: center;
+    /* -- Progress Section -- */
+    .progress-section {
+        padding: 20px 16px;
+        margin-bottom: 24px;
+        border-radius: var(--radius-md);
     }
 
-    .login-card {
-        padding: 40px 24px;
+    .progress-title {
+        font-size: 14px;
     }
 
-    .login-title {
-        font-size: 24px;
+    .progress-percentage {
+        font-size: 18px;
     }
 
-    .modal {
-        max-height: 95vh;
-        border-radius: var(--radius-lg);
-    }
-
-    .entry-image {
-        width: 90px;
-        height: 90px;
-    }
-
-    .ambient-kanji .kanji-float {
-        font-size: 60px !important;
+    /* -- Section Labels -- */
+    .section-label-jp {
+        margin-bottom: 14px;
+        gap: 12px;
     }
 
     .section-label-jp .label-kanji {
         font-size: 32px;
     }
+
+    .section-label-jp .label-text {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+
+    /* -- Section Header & Tabs -- */
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .section-title {
+        font-size: 20px;
+    }
+
+    .section-title .icon {
+        font-size: 22px;
+    }
+
+    .section-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding-bottom: 4px;
+        gap: 6px;
+    }
+
+    .section-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .section-tab {
+        padding: 8px 16px;
+        font-size: 12px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .btn-add {
+        justify-content: center;
+        font-size: 14px;
+        padding: 12px 24px;
+    }
+
+    /* -- Entry Cards -- */
+    .entries-feed {
+        gap: 14px;
+    }
+
+    .entry-card {
+        padding: 18px 16px;
+        border-radius: var(--radius-md);
+    }
+
+    .entry-header {
+        margin-bottom: 12px;
+    }
+
+    .entry-date {
+        font-size: 13px;
+    }
+
+    .entry-text {
+        font-size: 14px;
+        line-height: 1.65;
+    }
+
+    .entry-images {
+        gap: 8px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+    }
+
+    .entry-images::-webkit-scrollbar {
+        display: none;
+    }
+
+    .entry-image {
+        width: 100px;
+        height: 100px;
+        flex-shrink: 0;
+        border-radius: 12px;
+    }
+
+    .entry-tags {
+        gap: 6px;
+    }
+
+    .entry-tag {
+        padding: 3px 10px;
+        font-size: 11px;
+    }
+
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        font-size: 15px;
+    }
+
+    /* -- Modal: iOS-style bottom sheet -- */
+    .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .modal {
+        max-width: 100%;
+        max-height: 92vh;
+        border-radius: 24px 24px 0 0;
+        animation: modalSheetUp 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    @keyframes modalSheetUp {
+        from {
+            opacity: 0;
+            transform: translateY(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modal::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 3px;
+        margin: 12px auto 0;
+    }
+
+    .modal-header {
+        padding: 16px 20px 0;
+    }
+
+    .modal-title {
+        font-size: 18px;
+    }
+
+    .modal-body {
+        padding: 18px 20px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+        padding: 14px 16px;
+        font-size: 16px;
+        /* prevents iOS zoom on focus */
+        border-radius: 14px;
+    }
+
+    .form-textarea {
+        min-height: 120px;
+    }
+
+    .form-label {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    /* Mood Selector — 3 column grid */
+    .mood-selector {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .mood-option {
+        padding: 10px 8px;
+        font-size: 12px;
+        justify-content: center;
+        border-radius: 14px;
+        flex-direction: column;
+        gap: 4px;
+        text-align: center;
+    }
+
+    .mood-option span {
+        font-size: 20px;
+    }
+
+    /* Entry Type Toggle */
+    .entry-type-toggle {
+        margin-bottom: 18px;
+    }
+
+    .toggle-option {
+        padding: 10px 14px;
+        font-size: 12px;
+    }
+
+    /* Upload Area */
+    .upload-area {
+        padding: 22px 16px;
+    }
+
+    .upload-icon {
+        font-size: 32px;
+        margin-bottom: 8px;
+    }
+
+    .upload-text {
+        font-size: 13px;
+    }
+
+    .modal-footer {
+        padding: 0 20px 20px;
+        /* Add safe area padding for iPhones */
+        padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .btn-cancel,
+    .btn-save {
+        padding: 14px 24px;
+        font-size: 15px;
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+    }
+
+    /* -- Login Card -- */
+    .login-card {
+        padding: 44px 24px 36px;
+        border-radius: var(--radius-lg);
+        max-width: 100%;
+        margin: 0 12px;
+    }
+
+    .login-icon {
+        width: 76px;
+        height: 76px;
+        font-size: 34px;
+        margin-bottom: 16px;
+    }
+
+    .login-title {
+        font-size: 26px;
+    }
+
+    .login-subtitle-jp {
+        font-size: 12px;
+    }
+
+    .login-subtitle {
+        font-size: 13px;
+        margin-bottom: 28px;
+    }
+
+    .google-btn {
+        padding: 14px 28px;
+        font-size: 15px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .login-footer {
+        font-size: 11px;
+        margin-top: 22px;
+    }
+
+    .login-credits {
+        margin-top: 24px;
+        padding-top: 16px;
+    }
+
+    .credit-link {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+    .login-theme-toggle {
+        top: 16px;
+        right: 16px;
+    }
+
+    /* -- Toast: bottom centered on mobile -- */
+    .toast-container {
+        top: auto;
+        bottom: 24px;
+        right: 16px;
+        left: 16px;
+        align-items: stretch;
+    }
+
+    .toast {
+        min-width: unset;
+        width: 100%;
+        border-radius: 14px;
+        padding: 14px 18px;
+        font-size: 13px;
+    }
+
+    /* -- Lightbox -- */
+    .lightbox-overlay img {
+        max-width: 95%;
+        border-radius: var(--radius-md);
+    }
+
+    /* -- Empty State -- */
+    .empty-state {
+        padding: 50px 16px;
+    }
+
+    .empty-icon {
+        font-size: 56px;
+    }
+
+    .empty-title {
+        font-size: 18px;
+    }
+
+    .empty-text {
+        font-size: 13px;
+    }
+
+    /* -- Footer -- */
+    .footer-text {
+        font-size: 11px;
+        padding: 8px 0 20px;
+    }
+
+    /* -- Ambient elements: less on mobile for perf -- */
+    .ambient-kanji .kanji-float {
+        font-size: 50px !important;
+        opacity: 0.5;
+    }
+
+    .k3,
+    .k5,
+    .k6,
+    .k8 {
+        display: none;
+    }
 }
 
+/* ============================================
+   RESPONSIVE — SMALL PHONE (480px)
+   ============================================ */
 @media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
     .stats-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .stat-card {
+        padding: 16px 12px;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .stat-value {
+        font-size: 22px;
+    }
+
+    .stat-label {
+        font-size: 9px;
     }
 
     .nav-brand-text {
@@ -2016,9 +2529,89 @@ body {
         display: none;
     }
 
+    .nav-brand-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+
     .progress-details {
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
+    }
+
+    .progress-detail {
+        font-size: 12px;
+    }
+
+    .section-title {
+        font-size: 18px;
+    }
+
+    .modal-header {
+        padding: 12px 16px 0;
+    }
+
+    .modal-body {
+        padding: 14px 16px;
+    }
+
+    .modal-footer {
+        padding: 0 16px 16px;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Mood grid: 2 columns on very small screens */
+    .mood-selector {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .mood-option {
+        padding: 10px 6px;
+        font-size: 11px;
+    }
+
+    .entry-image {
+        width: 80px;
+        height: 80px;
+    }
+
+    .login-card {
+        padding: 36px 18px 28px;
+        margin: 0 8px;
+    }
+
+    .login-icon {
+        width: 64px;
+        height: 64px;
+        font-size: 28px;
+    }
+
+    .login-title {
+        font-size: 22px;
+    }
+
+    .google-btn {
+        padding: 13px 24px;
+        font-size: 14px;
+    }
+}
+
+/* ============================================
+   SAFE AREA — Notched phones
+   ============================================ */
+@supports (padding: env(safe-area-inset-top)) {
+    .navbar {
+        padding-top: max(10px, env(safe-area-inset-top));
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+    }
+
+    .main-content {
+        padding-left: max(14px, env(safe-area-inset-left));
+        padding-right: max(14px, env(safe-area-inset-right));
     }
 }
 
