@@ -6,13 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
         content="Track your daily study progress and life moments, save notes, images, and monitor your journey.">
-    <title>StudyVerse — Track Your Study & Life Progress</title>
+    <title>StudyVerse — 学びの宇宙</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+JP:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛩️</text></svg>">
 </head>
 
 <body>
+
+    <!-- Ambient Japanese Decorations -->
+    <div class="ambient-kanji">
+        <span class="kanji-float k1">学</span>
+        <span class="kanji-float k2">道</span>
+        <span class="kanji-float k3">心</span>
+        <span class="kanji-float k4">夢</span>
+        <span class="kanji-float k5">光</span>
+        <span class="kanji-float k6">和</span>
+        <span class="kanji-float k7">桜</span>
+        <span class="kanji-float k8">風</span>
+    </div>
 
     <!-- Animated Background -->
     <div class="bg-gradient"></div>
@@ -28,8 +45,16 @@
                 <span class="theme-icon" id="loginThemeIcon">🌙</span>
             </button>
             <div class="login-card">
-                <div class="login-icon">📚</div>
+                <!-- Decorative top wave -->
+                <div class="card-wave-top">
+                    <svg viewBox="0 0 500 40" preserveAspectRatio="none">
+                        <path d="M0,20 Q62.5,0 125,20 T250,20 T375,20 T500,20 L500,0 L0,0 Z" fill="currentColor"
+                            opacity="0.06" />
+                    </svg>
+                </div>
+                <div class="login-icon">⛩️</div>
                 <h1 class="login-title">StudyVerse</h1>
+                <p class="login-subtitle-jp">学びの宇宙</p>
                 <p class="login-subtitle">Track your daily study progress & life moments.<br>Save notes, images, and
                     watch your journey grow.</p>
                 <button class="google-btn" id="googleSignInBtn" onclick="signInWithGoogle()">
@@ -72,8 +97,11 @@
             <!-- Navbar -->
             <nav class="navbar">
                 <div class="nav-brand">
-                    <div class="nav-brand-icon">📚</div>
-                    <span class="nav-brand-text">StudyVerse</span>
+                    <div class="nav-brand-icon">⛩️</div>
+                    <div class="nav-brand-text-wrap">
+                        <span class="nav-brand-text">StudyVerse</span>
+                        <span class="nav-brand-jp">学びの宇宙</span>
+                    </div>
                 </div>
                 <div class="nav-user">
                     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"
@@ -93,6 +121,11 @@
             <main class="main-content">
 
                 <!-- Stats Row -->
+                <div class="section-label-jp">
+                    <span class="label-kanji">統</span>
+                    <span class="label-text">Statistics</span>
+                    <span class="label-line"></span>
+                </div>
                 <div class="stats-row">
                     <div class="stat-card">
                         <div class="stat-icon">📖</div>
@@ -132,6 +165,11 @@
                 </div>
 
                 <!-- Entries Section -->
+                <div class="section-label-jp">
+                    <span class="label-kanji">記</span>
+                    <span class="label-text">Journal</span>
+                    <span class="label-line"></span>
+                </div>
                 <div class="section-header">
                     <h2 class="section-title"><span class="icon">📝</span> My Journal</h2>
                     <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
@@ -158,6 +196,15 @@
                 </div>
 
             </main>
+
+            <!-- Footer decoration -->
+            <div class="footer-wave">
+                <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
+                    <path d="M0,30 Q180,0 360,30 T720,30 T1080,30 T1440,30 L1440,60 L0,60 Z" fill="currentColor"
+                        opacity="0.04" />
+                </svg>
+                <div class="footer-text">勉強の旅 — Study Journey</div>
+            </div>
         </div>
     </div>
 
