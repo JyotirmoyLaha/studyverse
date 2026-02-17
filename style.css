@@ -65,6 +65,20 @@
     /* Animations */
     --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* ── Legacy Compatibility (Aliases) ── */
+    --accent-gradient: var(--gradient-main);
+    --accent-1: var(--accent-primary);
+    --accent-2: rgba(139, 92, 246, 0.6);
+    /* Lighter violet */
+    --accent-3: var(--accent-tertiary);
+    --accent-4: var(--accent-secondary);
+    --accent-5: var(--accent-quaternary);
+    --sakura: var(--accent-secondary);
+    --wisteria: var(--accent-primary);
+    --bamboo: var(--accent-tertiary);
+    --koi-gold: var(--accent-quaternary);
+    --text-primary-jp: var(--text-primary);
 }
 
 /* ── Light Mode — Minimal Zen ── */
