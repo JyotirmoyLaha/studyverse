@@ -525,11 +525,9 @@ body {
     font-size: 34px;
     font-weight: 700;
     margin-bottom: 4px;
-    background: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--accent-primary);
     letter-spacing: -0.03em;
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
 }
 
 .login-subtitle-jp {
@@ -820,12 +818,10 @@ body {
     font-family: var(--font-heading);
     font-size: 20px;
     font-weight: 700;
-    background: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--accent-primary);
     letter-spacing: -0.02em;
     line-height: 1.2;
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
 }
 
 .nav-brand-jp {
@@ -1047,12 +1043,10 @@ body {
     font-size: 34px;
     font-weight: 800;
     margin-bottom: 4px;
-    background: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--accent-primary);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
+    text-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
 }
 
 .stat-label {
